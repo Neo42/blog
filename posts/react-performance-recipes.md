@@ -1,13 +1,13 @@
 ---
 title: 'React Performance Recipes'
 excerpt: 'Performance optimization can be daunting, but there are still more solutions than problems. In this post, I talked about how to tackle common performance issues when developing with React. Get a solution for every React performance problem you might encounter.'
-coverImage: '/assets/blog/hello-world/cover.jpg'
+coverImage: '/assets/blog/react-po/cover.jpg'
 date: '2022-01-05'
 author:
   name: Hao Jiang
   picture: '/assets/blog/authors/hao.png'
 ogImage:
-  url: '/assets/blog/hello-world/cover.jpg'
+  url: '/assets/blog/react-po/cover.jpg'
 ---
 
 ## Problem: Unnecessary Callback Re-Initiation

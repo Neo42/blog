@@ -1,13 +1,13 @@
 ---
 title: 'How to Build a Mini React (wip 🚧)'
 excerpt: 'Create your own version of a thing is THE way to understand it. So I decided to rewrite a simple version of React from scratch. I''m going to call the little library "Reacti" since it is just my personal little "recreation" of that mighty tool, and that name sounds natural to me.'
-coverImage: '/assets/blog/hello-world/cover.jpg'
+coverImage: '/assets/blog/react/cover.jpg'
 date: '2021-06-30'
 author:
   name: Hao Jiang
   picture: '/assets/blog/authors/hao.png'
 ogImage:
-  url: '/assets/blog/hello-world/cover.jpg'
+  url: '/assets/blog/react/cover.jpg'
 ---
 
 Create your own version of a thing is THE way to understand it. So I decided to rewrite a simple version of React from scratch. I'm going to call the little library "Reacti" since it is just my personal little "reinvention" of that mighty tool, and that name sounds natural to me.

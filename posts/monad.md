@@ -180,6 +180,10 @@ number
 
 The `chain` method is what makes a functor a monad. In Haskell, the `chain` method is called `bind`, but in JavaScript, to avoid the conflict between the built-in `bind` method on functions, people tend to use the name `chain` for this pattern.
 
+We can visualize a monad like this:
+
+![](/assets/blog/monad/monad.png)
+
 ## Summary
 
 In short, a monad is a functor that can unwrap its own kind and get out the value inside them.
