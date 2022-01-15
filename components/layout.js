@@ -1,7 +1,7 @@
 import Alert from '../components/alert'
 import Meta from '../components/meta'
 
-export default function Layout({ preview, children }) {
+export default function Layout({preview, children}) {
   return (
     <>
       <Meta />

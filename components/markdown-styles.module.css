@@ -9,14 +9,24 @@
   @apply my-6;
 }
 
-.markdown h2 {
-  @apply text-3xl mt-12 mb-4 leading-snug;
+.markdown h2,
+.markdown h2 code {
+  @apply mt-12 mb-4 text-3xl leading-snug;
 }
 
-.markdown h3 {
-  @apply text-2xl mt-8 mb-4 leading-snug;
+.markdown h3,
+.markdown h3 code {
+  @apply mt-8 mb-4 text-2xl leading-snug;
 }
 
 .markdown code {
+  font-family: Dank Mono, Fira Code, Menlo, monospace;
   font-size: 17px;
+}
+
+.markdown img,
+.markdown iframe,
+.markdown object {
+  @apply block max-w-full;
+  margin: 1em auto;
 }
