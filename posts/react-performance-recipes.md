@@ -12,19 +12,27 @@ ogImage:
 
 ## Problem: Unnecessary Callback Re-Initiation
 
-When you're using a callback function within `useEffect`, it's hard to predict how callback function will be modified in the future. Only passing in certain variables from the callback to the deps list won't do. Because once the variables passed in gets removed, your dependencies won't work any more. But you still have to provide some values to the dependency list to sync `useEffect` with the callback change.
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
 React.useEffect(() => {
   updateLocalStorage()
-}, []) // <-- what goes in that dependency list?
+}, []) // what goes in that dependency list?
 ```
 
-One way we can solve this is to include the entire callback function into the dependency list.
+</StepHead>
 
-```js
+When you're using a callback function within `useEffect`, it's hard to predict how callback function will be modified in the future. Only passing in certain variables from the callback to the deps list won't do. Because once the variables passed in gets removed, your dependencies won't work any more. But you still have to provide some values to the dependency list to sync `useEffect` with the callback change.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js focus=5
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
 React.useEffect(() => {
@@ -32,19 +40,47 @@ React.useEffect(() => {
 }, [updateLocalStorage]) // <-- function as a dependency
 ```
 
-But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be recreated (or "re-initialized") from scratch every time the component gets rendered, and since the function type is **compared through references**, every re-initialized callback function is different. So `useEffect` fires in every render due to the value referential inequality of the callback function in the deps list.
+</StepHead>
+
+One way we can solve this is to include the entire callback function into the dependency list.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
 
 ```js
+// recreated in every render
 const updateLocalStorage = () =>
-  window.localStorage.setItem('count', count) // will be recreated in every render
+  window.localStorage.setItem('count', count)
 React.useEffect(() => {
   updateLocalStorage()
 }, [updateLocalStorage]) // changes in every render
 ```
 
+</StepHead>
+
+But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be recreated (or "re-initialized") from scratch every time the component gets rendered, and since the function type is compared through references, every re-initialized callback function is [different](focus://1:3,6). So `useEffect` fires in every render due to the value referential inequality of the callback function in the deps list.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js
+// how to optimize this with useCallback?
+const updateLocalStorage = () =>
+  window.localStorage.setItem('count', count)
+React.useEffect(() => {
+  updateLocalStorage()
+}, [updateLocalStorage])
+```
+
+</StepHead>
+
 ### Solution: `React.useCallback`
 
 `const memoizedCallback = React.useCallback(callback, dependencyList)`: **Memoizes a callback function, only re-initialized it when the dependencies change and avoids referential inequality.**
+
+<StepHead>
 
 ```js
 const updateLocalStorage = React.useCallback(
@@ -60,37 +96,83 @@ React.useEffect(() => {
 }, [updateLocalStorage])
 ```
 
-Notice: `useCallback` won't necessarily make a callback function better for performance. Here is why:
+</StepHead>
+
+And now every time the component gets re-rendered, the `updateLocalStorage` callback will only re-initialized when the [`count`](focus://7) value changes, otherwise React will use the same copy of it.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
 
 ```js
-// a callback function vs its useCallback version
+// a callback function
 const callback = () => {}
+
+// vs its memoized version
 const memoizedCallback = React.useCallback(
   callback,
   [someValue]
 )
 ```
 
-As you can see, `useCallback` can cause more memory allocation and the memoized one won't be garbage collected after the render, which is something you should be aware of. So remember to only `useCallback` when you have to.
+</StepHead>
+
+`useCallback` can be powerful if properly used, but it won't necessarily make a callback function better for performance. As you can see, it [causes more memory allocation](focus://5,7,8) and the memoized one won't be garbage collected after the render, which is something you should be aware of. So remember to only `useCallback` when you have to.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+</HikeWithNoPreview>
 
 ## Problem: Unnecessary Expensive Calculation
 
-React comes with the concept of "rendering". When a component is being rendered by React, that means React is calling the component function (or the `render` method in the case of class components). This comes with an unfortunate limitation that calculations performed within the function (or `render`) will be performed every single render, regardless of whether the inputs for the calculations change. For example:
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
 function MyComponent({x, y}) {
-  const result = expensiveCalculation(x, y) // will be called in every render
+  return <div>Hello World</div>
+}
+```
+
+</StepHead>
+
+React comes with the concept of "rendering". When a component is being rendered by React, that means React is calling the component function (or the `render` method in the case of class components). This comes with an unfortunate limitation that calculations performed within the function (or `render`) will be performed every single render, regardless of whether the inputs for the calculations change. For example:
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js
+function MyComponent({x, y}) {
+  const result = expensiveCalculation(x, y)
   return <div>The result is {result}.</div>
 }
 ```
 
-Every time the parent component of `MyComponent` is re-rendered or some state is added later and setting the state triggers re-renders, we'll be calling `expensiveCalculation` in every render of this component, which leads to performance bottlenecks.
+</StepHead>
+
+Every time the parent component of `MyComponent` is re-rendered or some state is added later and setting the state triggers re-renders, so for `expensiveCalculation`, [it will be recalculated in every render](focus://2) of this component, which leads to performance bottlenecks.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js
+// how to optimize this with useMemo?
+function MyComponent({x, y}) {
+  const result = expensiveCalculation(x, y)
+  return <div>The result is {result}.</div>
+}
+```
+
+</StepHead>
 
 ### Solution: `React.useMemo`
 
 `const memoizedResult = React.useMemo(calculationCallback, dependencyList)`: **Memoizes the result of the calculation and only calls the calculation when the dependencies changes.**
 
-With `useMemo`, this is the optimized version of `MyComponent`:
+<StepHead>
 
 ```js
 function MyComponent({x, y}) {
@@ -102,126 +184,105 @@ function MyComponent({x, y}) {
 }
 ```
 
-And now `result` will only be calculated again when `x` or `y` changes.
+</StepHead>
 
-#### `React.useMemo`: Integration with context
+With [`useMemo`](focus://2:4), here is the optimized version of `MyComponent`. And now `result` will only be calculated again when `x` or `y` changes.
 
-`useMemo` can also be integrated with context to prevent unwanted re-renders caused by context changes. The way that context works is that whenever the provided value changes from one render to another, it triggers a re-render of all the consuming components (which will re-render whether or not they’re memoized). For example:
+<CodeSlot style={{zoom: 0.8}}/>
 
-```js
-const CountContext = React.createContext()
-
-function CountProvider(props) {
-  const [count, setCount] = React.useState(0)
-  const value = [count, setCount]
-  return (
-    <CountContext.Provider
-      value={value}
-      {...props}
-    />
-  )
-}
-```
-
-Every time the `<CountProvider />` is re-rendered, maybe because of parent re-renders, the value is brand new, so even though the `count` value itself may stay the same, all component consumers will be re-rendered.
-
-The quick and easy solution to this problem is to memoize the value that you provide to the context provider:
-
-```js
-const CountContext = React.createContext()
-
-function CountProvider(props) {
-  const [count, setCount] = React.useState(0)
-  const value = React.useMemo(
-    () => [count, setCount],
-    [count]
-  )
-  return (
-    <CountContext.Provider
-      value={value}
-      {...props}
-    />
-  )
-}
-```
+</HikeWithNoPreview>
 
 ## So when should I `useMemo` and `useCallback`?
 
-1. Use `useCallback` when you want to avoid unnecessary re-renders caused by **referential inequality**, for example:
+Use `useCallback` when you want to avoid unnecessary re-renders caused by **referential inequality**, for example:
 
-   - When using callbacks in `useEffect` & passing the callback into dependency lists.
+<HikeWithNoPreview>
 
-   ```js
-   function Foo({bar, baz}) {
-     React.useEffect(() => {
-       const options = {bar, baz}
-       buzz(options)
-     }, [bar, baz]) // we want this to re-run if bar or baz change
-     return <div>foobar</div>
-   }
+<StepHead>
 
-   function Foo({bar, baz}) {
-     React.useEffect(() => {
-       const options = {bar, baz}
-       buzz(options)
-     }, [bar, baz])
-     return <div>foobar</div>
-   }
+```js
+function Foo({bar, baz}) {
+  React.useEffect(() => {
+    const options = {bar, baz}
+    buzz(options)
+  }, [bar, baz])
+  return <div>foobar</div>
+}
 
-   function Blub() {
-     const bar =
-       React.useCallback(() => {}, [])
-     const baz = React.useMemo(
-       () => [1, 2, 3],
-       []
-     )
-     return <Foo bar={bar} baz={baz} />
-   }
-   ```
+function Foo({bar, baz}) {
+  React.useEffect(() => {
+    const options = {bar, baz}
+    buzz(options)
+  }, [bar, baz])
+  return <div>foobar</div>
+}
 
-   - When using `React.memo` to avoid unnecessary child re-renders & passing callbacks as event handlers into child components
+function Blub() {
+  const bar = React.useCallback(() => {}, [])
+  const baz = React.useMemo(
+    () => [1, 2, 3],
+    []
+  )
+  return <Foo bar={bar} baz={baz} />
+}
+```
 
-   ```js
-   const CountButton = React.memo(
-     function CountButton({onClick, count}) {
-       return (
-         <button onClick={onClick}>
-           {count}
-         </button>
-       )
-     }
-   )
-   function DualCounter() {
-     const [count1, setCount1] =
-       React.useState(0)
-     const increment1 = React.useCallback(
-       () => setCount1((c) => c + 1),
-       []
-     )
+</StepHead>
 
-     const [count2, setCount2] =
-       React.useState(0)
-     const increment2 = React.useCallback(
-       () => setCount2((c) => c + 1),
-       []
-     )
+When using [values](focus://18:21) as [dependencies](focus://2,5,10,13) in `useEffect`.
 
-     return (
-       <>
-         <CountButton
-           count={count1}
-           onClick={increment1}
-         />
-         <CountButton
-           count={count2}
-           onClick={increment2}
-         />
-       </>
-     )
-   }
-   ```
+<CodeSlot style={{zoom: 0.8}}/>
 
-2. Use `useMemo` when you want to avoid unnecessary **computationally expensive calculations**.
+<StepHead>
+
+```js
+const CountButton = React.memo(
+  function CountButton({onClick, count}) {
+    return (
+      <button onClick={onClick}>
+        {count}
+      </button>
+    )
+  }
+)
+
+function DualCounter() {
+  const [count1, setCount1] =
+    React.useState(0)
+  const increment1 = React.useCallback(
+    () => setCount1((c) => c + 1),
+    []
+  )
+
+  const [count2, setCount2] =
+    React.useState(0)
+  const increment2 = React.useCallback(
+    () => setCount2((c) => c + 1),
+    []
+  )
+
+  return (
+    <>
+      <CountButton
+        count={count1}
+        onClick={increment1}
+      />
+      <CountButton
+        count={count2}
+        onClick={increment2}
+      />
+    </>
+  )
+}
+```
+
+</StepHead>
+
+When using [`React.memo`](focus://1,9) to avoid unnecessary child re-renders when you pass complex [callbacks](focus://14:17,21:24) as event handlers into child components. Because callback functions will be re-initialized every re-render.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
 
 ```js
 function RenderPrimes({
@@ -237,6 +298,14 @@ function RenderPrimes({
 }
 ```
 
+</StepHead>
+
+Use `useMemo` when you want to avoid unnecessary computationally expensive [calculations](focus://5:9).
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+</HikeWithNoPreview>
+
 ## Problem: Unnecessary Child Re-Renders
 
 Besides function re-initiation and value recalculation, there is another behavior that can lead to performance bottlenecks: **unnecessary re-renders**. As I said before, rendering means that React is calling your component function or its `render` method. React renders a component to recalculate the data to reflect the changes within the component. In what circumstances will a re-render be unnecessary?
@@ -248,7 +317,11 @@ There are four reasons for React to re-render a component:
 3. The **context** values the component uses have changed.
 4. The component's **parent** has been re-rendered because of the reasons above.
 
-Now the first three can't and also shouldn't be avoided because those are basically data changes, which must be recalculated and displayed on the screen. But the last one is, most of the time, unnecessary. When a parent component changes, if there is no change to be applied on the child, there is no need to call the component function to reflect any data changes. Here is an example:
+Now the first three can't and also shouldn't be avoided because those are basically data changes, which must be recalculated and displayed on the screen. But the last one is, most of the time, unnecessary. When a parent component changes, if there is no change to be applied on the child, there is no need to call the component function to reflect any data changes.
+
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
 function CountButton({count, onClick}) {
@@ -274,8 +347,10 @@ function NameInput({name, onNameChange}) {
 function Example() {
   const [name, setName] = React.useState('')
   const [count, setCount] = React.useState(0)
-  const increment = () =>
+  const increment = () => {
     setCount((c) => c + 1)
+  }
+
   return (
     <div>
       <div>
@@ -298,17 +373,193 @@ function Example() {
 }
 ```
 
-When you click the `CountButton`, it changes the state of its parent `Example`, which triggers a re-render for the parent, which in turn leads to the unnecessary re-render of the `NameInput` even though none of its props has changed.
+</StepHead>
+
+Here is an example:
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js
+function CountButton({count, onClick}) {
+  return (
+    <button onClick={onClick}>{count}</button>
+  )
+}
+
+function NameInput({name, onNameChange}) {
+  return (
+    <label>
+      Name:{' '}
+      <input
+        value={name}
+        onChange={(e) =>
+          onNameChange(e.target.value)
+        }
+      />
+    </label>
+  )
+}
+
+function Example() {
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
+  const increment = () => {
+    setCount((c) => c + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
+}
+```
+
+</StepHead>
+
+When you click the [`CountButton`](focus://31:34), it changes the [state](focus://23:26) of its parent `Example`, which triggers a re-render for `Example`, which in turn leads to the unnecessary re-render of the [`NameInput`](focus://37:40) even though none of its props has changed.
+
+<StepHead>
+
+```js
+function CountButton({count, onClick}) {
+  return (
+    <button onClick={onClick}>{count}</button>
+  )
+}
+
+function NameInput({name, onNameChange}) {
+  return (
+    <label>
+      Name:{' '}
+      <input
+        value={name}
+        onChange={(e) =>
+          onNameChange(e.target.value)
+        }
+      />
+    </label>
+  )
+}
+
+function Example() {
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
+  const increment = () => {
+    setCount((c) => c + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
+}
+```
+
+</StepHead>
 
 So how do we solve this problem?
+
+<StepHead>
+
+```js
+function CountButton({count, onClick}) {
+  return (
+    <button onClick={onClick}>{count}</button>
+  )
+}
+
+function NameInput({name, onNameChange}) {
+  return (
+    <label>
+      Name:{' '}
+      <input
+        value={name}
+        onChange={(e) =>
+          onNameChange(e.target.value)
+        }
+      />
+    </label>
+  )
+}
+
+function Example() {
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
+  const increment = () => {
+    setCount((c) => c + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
+}
+```
+
+</StepHead>
 
 ### Solution: `React.memo`
 
 `React.memo(component)`: memoize a component and only re-render it when the props it receives changes.
 
-To prevent the unnecessary re-render of `NameInput`, we can wrap it with `React.memo` as a bail-out. Like this:
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
 
 ```js
+function CountButton({count, onClick}) {
+  return (
+    <button onClick={onClick}>{count}</button>
+  )
+}
+
 function NameInput({name, onNameChange}) {
   return (
     <label>
@@ -323,13 +574,45 @@ function NameInput({name, onNameChange}) {
   )
 }
 NameInput = React.memo(NameInput)
+
+function Example() {
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
+  const increment = () => {
+    setCount((c) => c + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
+}
 ```
+
+</StepHead>
+
+To prevent the unnecessary re-render of `NameInput`, we can wrap it with `React.memo` as a bail-out. Like [this](focus://20):
+
+<CodeSlot style={{zoom: 0.8}}/>
 
 By doing this we let React know that it doesn't need a re-render until at least one of its props changes.
 
-#### `React.memo`: Not everything should be memoized
-
-You might want to ask what if we do this to the `CountButton`. Here is the answer: If we were to wrap it into `React.memo`, it wouldn't work, unless we also wrap the `increment` function within the `Example` with `React.useCallback`. Because `increment` always gets re-initialized every time `Example` gets re-rendered, which makes the `onClick` prop of `CountButton` changes all the time due to referential inequality. But `React.memo` only prevent re-renders when all the props stay the same. So to make `React.memo` work, we have to first memoize the `increment` handler in `Example`. Like this:
+<StepHead>
 
 ```js
 function CountButton({count, onClick}) {
@@ -339,23 +622,126 @@ function CountButton({count, onClick}) {
 }
 CountButton = React.memo(CountButton)
 
+function NameInput({name, onNameChange}) {
+  return (
+    <label>
+      Name:{' '}
+      <input
+        value={name}
+        onChange={(e) =>
+          onNameChange(e.target.value)
+        }
+      />
+    </label>
+  )
+}
+NameInput = React.memo(NameInput)
+
 function Example() {
-  // ...
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
+  const increment = () => {
+    setCount((c) => c + 1)
+  }
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
+}
+```
+
+</StepHead>
+
+#### `React.memo`: Might not work like a charm
+
+You might want to ask what if we do this to the `CountButton`. Here is the answer: If we were to only wrap it into `React.memo` like [this](focus://6), _it wouldn't work_, because `increment` always gets re-initialized every time `Example` gets re-rendered, which makes the `onClick` prop of `CountButton` changes all the time due to referential inequality. But `React.memo` only prevent re-renders when all the props stay the same.
+
+<CodeSlot style={{zoom: 0.8}}/>
+
+<StepHead>
+
+```js
+function CountButton({count, onClick}) {
+  return (
+    <button onClick={onClick}>{count}</button>
+  )
+}
+CountButton = React.memo(CountButton)
+
+function NameInput({name, onNameChange}) {
+  return (
+    <label>
+      Name:{' '}
+      <input
+        value={name}
+        onChange={(e) =>
+          onNameChange(e.target.value)
+        }
+      />
+    </label>
+  )
+}
+NameInput = React.memo(NameInput)
+
+function Example() {
+  const [name, setName] = React.useState('')
+  const [count, setCount] = React.useState(0)
   const increment = React.useCallback(
     () => setCount((c) => c + 1),
     []
   )
-  // ...
+
+  return (
+    <div>
+      <div>
+        <CountButton
+          count={count}
+          onClick={increment}
+        />
+      </div>
+      <div>
+        <NameInput
+          name={name}
+          onNameChange={setName}
+        />
+      </div>
+      {name ? (
+        <div>{`${name}'s favorite number is ${count}`}</div>
+      ) : null}
+    </div>
+  )
 }
 ```
 
-Just so you know that it's better to use `React.memo` more mindfully and not to shove everything into it.
+</StepHead>
 
-#### `React.memo`: Use a custom comparator function
+**Unless** we also wrap the `increment` function within the `Example` with `React.useCallback`. Like [this](focus://26:29):
 
-Most of the time, a simple `React.memo` works just fine, there are times when its default behavior isn't what you desire.
+Just so you know that it's better to use `React.memo` more mindfully rather than shove everything into it.
 
-Imagine you are rendering a menu containing a list of items, and the user can highlight a item at a time. Your `Menu` and `ListItem` components might look like this.
+<CodeSlot style={{zoom: 0.8}}/>
+
+</HikeWithNoPreview>
+
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
 function Menu({
@@ -417,11 +803,75 @@ function ListItem({
 ListItem = React.memo(ListItem)
 ```
 
-Both of these components are wrapped into `React.memo` already. So now you might expect this way the performance has been optimized to its highest level. But here is a problem still unsolved: when the user highlights a different item, besides the the previously and newly highlighted items, all the other untouched items will still be re-rendered. And that's because every time the user highlights a different item, they changes the `highlightedIndex` prop, which triggers the re-render of each item, no matter if it was highlighted previously or is highlighted now or never has been touched the whole time.
+</StepHead>
 
-To solve this problem, you'll need to change how React should compare props over time. And this is where the **custom comparator** comes into play. You can pass a custom comparator as the second argument into `React.memo` so that it uses your, hopefully better, rules, instead of its default rules, for prop comparison. For example, for the `Menu` and `ListItem`, we can do this:
+#### `React.memo`: Use a custom comparator function
+
+Most of the time, a simple `React.memo` works just fine, there are times when its default behavior isn't what you desire.
+
+Imagine you are rendering a menu containing a list of items, and the user can highlight a item at a time. Your `Menu` and `ListItem` components might look like [this](focus://1,27).
+
+Both of these components are wrapped into `React.memo` [already](focus://25,57). So now you might expect this way the performance has been optimized to its highest level. But here is a problem still unsolved: when the user highlights a different item, besides the the previously and newly highlighted items, all the other untouched items will still be re-rendered. And that's because every time the user highlights a different item, they changes the `highlightedIndex` prop, which triggers the re-render of each item, no matter if it was highlighted previously or is highlighted now or never has been touched the whole time.
+
+<StepHead>
 
 ```js
+function Menu({
+  items,
+  getMenuProps,
+  getItemProps,
+  highlightedIndex,
+  selectedItem,
+}) {
+  return (
+    <ul {...getMenuProps()}>
+      {items.map((item, index) => (
+        <ListItem
+          key={item.id}
+          getItemProps={getItemProps}
+          item={item}
+          index={index}
+          selectedItem={selectedItem}
+          highlightedIndex={highlightedIndex}
+        >
+          {item.name}
+        </ListItem>
+      ))}
+    </ul>
+  )
+}
+Menu = React.memo(Menu)
+
+function ListItem({
+  getItemProps,
+  item,
+  index,
+  selectedItem,
+  highlightedIndex,
+  ...props
+}) {
+  const isSelected =
+    selectedItem?.id === item.id
+  const isHighlighted =
+    highlightedIndex === index
+  return (
+    <li
+      {...getItemProps({
+        index,
+        item,
+        style: {
+          fontWeight: isSelected
+            ? 'bold'
+            : 'normal',
+          backgroundColor: isHighlighted
+            ? 'lightgray'
+            : 'inherit',
+        },
+        ...props,
+      })}
+    />
+  )
+}
 ListItem = React.memo(
   ListItem,
   (prevProps, nextProps) => {
@@ -467,11 +917,13 @@ ListItem = React.memo(
 )
 ```
 
+</StepHead>
+
+To solve this problem, you'll need to change how React should compare props over time. And this is where the **custom comparator** comes into play. You can pass a custom comparator as the second argument into `React.memo` so that it uses your, hopefully better, rules, instead of its default rules, for prop comparison. For example, for the `Menu` and `ListItem`, we can do [this](focus://59:98):
+
 This way the `ListItem` won't be re-rendered unless it is involved in highlight changes.
 
-#### `React.memo`: Parent keeps the calculation, children keep the primitive props
-
-You might notice the logic in the custom comparator above is quite mind-boggling, especially when you are working on a big project with a team of many people. So for that scenario, one takeaway you might find valuable is that, if you're rendering a ton of instances of a particular component, try to do calculations a little higher -- maybe in the parent or even higher -- so you only need to pass primitive values to the component and let those value changes trigger DOM updates. That way you won't have to worry about breaking memoization or create a custom comparator, which can save you quite some code and brain cells. For example, we can simplify the code above like this:
+<StepHead>
 
 ```js
 function Menu({
@@ -536,7 +988,17 @@ function ListItem({
 ListItem = React.memo(ListItem)
 ```
 
+</StepHead>
+
+#### `React.memo`: Parent keeps the calculation, children keep the primitive props
+
+You might notice the logic in the custom comparator above is quite mind-boggling, especially when you are working on a big project with a team of many people. So for that scenario, one takeaway you might find valuable is that, if you're rendering a ton of instances of a particular component, try to do calculations a little higher -- maybe in the parent or even higher -- so you only need to pass primitive values to the component and let those value changes trigger DOM updates. That way you won't have to worry about breaking memoization or create a custom comparator, which can save you quite some code and brain cells. For example, we can simplify the code above like [this](focus://16:22,36:38,59:60):
+
+<CodeSlot style={{zoom: 0.8}}/>
+
 Notice how we move the details of the highlight and selection calculation up to the parent component `Menu`, only pass two boolean props `isHighlighted` and `isSelected` to the child component `ListItem` and don't even have to write a custom comparator function.
+
+</HikeWithNoPreview>
 
 ## Problem: Rendering huge lists with large quantities of data
 
@@ -550,10 +1012,13 @@ But it's still possible for us to work around this: when the user scroll through
 
 ![Windowing a grid (table)](https://user-images.githubusercontent.com/22409868/148177888-9e3dadde-dd42-4e15-89a4-575fcb15d536.png)
 
-There are many libraries that allow you to use this "windowing" technique, such as [`react-window`](https://react-window.vercel.app/#/examples/list/fixed-size) and [`react-virtualized`](https://bvaughn.github.io/react-virtualized/). These two are older compared to [`react-virtual`](https://react-virtual.tanstack.com/), which can be added to your project with one simple hook and supports all kinds of customization, including vertical, horizontal, grid, fixed, variable, dynamic, smooth and even infinite virtualization. Definitely give it a try! Here is a simple example of the usage of `react-virtual`.
+There are many libraries that allow you to use this "windowing" technique, such as [`react-window`](https://react-window.vercel.app/#/examples/list/fixed-size) and [`react-virtualized`](https://bvaughn.github.io/react-virtualized/). These two are older compared to [`react-virtual`](https://react-virtual.tanstack.com/), which can be added to your project with one simple hook and supports all kinds of customization, including vertical, horizontal, grid, fixed, variable, dynamic, smooth and even infinite virtualization. Definitely give it a try!
+
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
-// before
 function MyListOfData({items}) {
   return (
     <ul style={{height: 300}}>
@@ -563,8 +1028,17 @@ function MyListOfData({items}) {
     </ul>
   )
 }
+```
 
-// after
+</StepHead>
+
+Here is a regular data list component.
+
+<StepHead>
+
+```js
+import {useVirtual} from 'react-virtual'
+
 function MyListOfData({items}) {
   const listRef = React.useRef()
   const rowVirtualizer = useVirtual({
@@ -615,6 +1089,12 @@ function MyListOfData({items}) {
 }
 ```
 
+</StepHead>
+
+And here is the windowed version with `react-virtual`.
+
+</HikeWithNoPreview>
+
 ## Problem: Global state changes trigger slow batch re-renders
 
 Optimizing performance for a few components are relatively easy, compared to doing that for many different components when you use contexts or global state management tools, like Redux, to manage the state of your apps. This scenario doesn't give you a clear clue to fix the problem because none of the components are slow in isolation but they update slow together when there is a global state change. The root of the problem is that there are just too many components responding to the state update and many of them shouldn't even do that.
@@ -631,18 +1111,76 @@ Things happen in production, especially for performance problems. There will be 
 
 ### Solution: Use the `<React.Profiler>`
 
-The React team has created an [`<React.Profiler>`](https://reactjs.org/docs/profiler.html) API specifically for situation like this. It doesn’t give us quite as much information as the React DevTools do, but it does give us some useful information. Here is a basic example:
+The React team has created an [`<React.Profiler>`](https://reactjs.org/docs/profiler.html) API specifically for situation like this. It doesn’t give us quite as much information as the React DevTools do, but it does give us some useful information.
+
+<HikeWithNoPreview>
+
+<StepHead>
 
 ```js
-<App>
-  <Profiler
-    id="Navigation"
-    onRender={onRenderCallback}
-  >
+return (
+  <App>
     <Navigation {...props} />
-  </Profiler>
-  <Main {...props} />
-</App>
+  </App>
+)
 ```
 
-It’s important to note that unless you build your app using `react-dom/profiling` and `scheduler/tracing-profiling` this component won’t do anything.
+</StepHead>
+
+Here is a basic example:
+
+<StepHead>
+
+```js
+return (
+  <App>
+    <Profiler
+      id="Navigation"
+      onRender={onRenderCallback}
+    >
+      <Navigation {...props} />
+    </Profiler>
+  </App>
+)
+```
+
+</StepHead>
+
+Wrap the target component within the `Profiler` to enable this feature. It’s important to note that unless you build your app using `react-dom/profiling` and `scheduler/tracing-profiling` this component won’t do anything.
+
+<StepHead>
+
+```js
+function onRenderCallback(
+  id,
+  phase,
+  actualDuration,
+  baseDuration,
+  startTime,
+  commitTime,
+  interactions
+) {
+  //
+}
+
+// ...
+return (
+  <App>
+    <Profiler
+      id="Navigation"
+      onRender={onRenderCallback}
+    >
+      <Navigation {...props} />
+    </Profiler>
+  </App>
+)
+```
+
+</StepHead>
+
+For the `onRender` prop, you'll need to pass a callback function with a particular [signature](focus://2:8) otherwise the profiler component won't work. The `id` prop of the Profiler tree that has just committed.
+You can trace the `phase` of either "mount" (if the tree just mounted) or "update" (if it re-rendered. `actualDuration` is the time spent rendering the committed update. `baseDuration` is the estimated time to render the entire subtree without memoization. `startTime` is when React began rendering this update. `commitTime` is when React committed this update. `interactions` is the Set of interactions belonging to this update. In the callback you can do anything you want with the data, including do calculation, pass the result to your backend, aggregate or log render timings and so on.
+
+</HikeWithNoPreview>
+
+I might write about more things on React performance, such as devtools, React Query, browser performance profiler and so on. Stay tuned.

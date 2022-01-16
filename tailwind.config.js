@@ -3,6 +3,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'editor-bg': '#252b37',
+        'button-bg': '#607487',
         'accent-1': '#FAFAFA',
         'accent-2': '#EAEAEA',
         'accent-7': '#333',
