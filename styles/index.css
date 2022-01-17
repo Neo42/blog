@@ -21,3 +21,7 @@
 .max-w-screen-870 {
   max-width: 870px;
 }
+
+.ch-hike-sticker {
+  top: calc(65vh - var(--sticker-height) / 2 + var(--page-header-height) / 2);
+}
