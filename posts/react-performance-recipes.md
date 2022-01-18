@@ -117,7 +117,7 @@ const memoizedCallback = React.useCallback(
 
 </StepHead>
 
-`useCallback` can be powerful if properly used, but it won't necessarily make a callback function better for performance. As you can see, it [causes more memory allocation](focus://5,7,8) and the memoized one won't be garbage collected after the render, which is something you should be aware of. So remember to only `useCallback` when you have to.
+`useCallback` can be powerful if properly used, but it won't necessarily make a callback function better for performance. As you can see, it [causes extra memory allocation](focus://5,7,8) and the memoized one won't be garbage collected after the render, which is something you should be aware of. So remember to only `useCallback` when you have to.
 
 <CodeSlot style={{zoom: 0.8}}/>
 
