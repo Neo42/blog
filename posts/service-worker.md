@@ -2,9 +2,6 @@
 title: 'Service Worker Explained'
 excerpt: 'Websites are by default fragile and brittle, as they are always failing because of slow connections, server downtime and simply going offline. However, service workers might be a good way to help the web have an intuitive and empathetic experience for the user.'
 date: '2022-03-23'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
 ---
 
 ## Web Worker
@@ -277,7 +274,7 @@ And then define the function that put those resources into cache.
 
 ```js
 async function cacheLoggedOutFiles(
-  forceReload = false
+  {forceReload} = {forceReload: false}
 ) {
   var cache = await caches.open(cacheName)
 
