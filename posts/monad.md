@@ -3,11 +3,6 @@ title: 'How to Build a Mini IO Monad'
 excerpt: 'Instinctively, when we look at a difficult concept for the first time, that ONE question that pops into our minds is usually "what is it". Because asking "what" is such a valuable human nature that helps us protect ourselves from our natural enemy in the old days. And it can be effective if we already know what we could be dealing with. Lions, tigers, or cute puppies. But if this unfamiliar concept is deeper than you thought it would be, you''d better switch your tactics and asking "how does it work", more close to our instincts, "what can it do" or "what can it be used for". By asking the right question, we can just discover the concept ourselves.'
 coverImage: '/assets/blog/monad/cover.jpg'
 date: '2021-04-25'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
-ogImage:
-  url: '/assets/blog/monad/cover.jpg'
 ---
 
 _Instinctively,_ when we look at a difficult concept for the first time, that ONE question that pops into our minds is usually "what is it". Because asking "what" is such a valuable human nature that helps us protect ourselves from our natural enemy in the old days. And it can be effective if we already know what we could be dealing with. Lions, tigers, or cute puppies. But if this unfamiliar concept is deeper than you thought it would be, you'd better switch your tactics and asking "how does it work", more close to our instincts, "what can it do" or "what can it be used for". By asking the right question, we can just discover the concept ourselves.

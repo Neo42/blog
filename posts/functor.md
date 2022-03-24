@@ -3,11 +3,6 @@ title: 'How to Build a Mini Functor'
 excerpt: "Functors and monads. Both of them are useful and important design patterns in functional programming. More importantly, you can't understand monads without functors. So in this post, let's talk about functors. let's start with the definition of a functor."
 coverImage: '/assets/blog/functor/cover.jpg'
 date: '2021-04-12'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
-ogImage:
-  url: '/assets/blog/functor/cover.jpg'
 ---
 
 Functors and monads. Both of them are useful and important design patterns in functional programming. More importantly, you can't understand monads without functors. So in this post, let's talk about functors. let's start with the definition of a functor.

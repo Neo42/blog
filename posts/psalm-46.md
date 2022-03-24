@@ -3,11 +3,6 @@ title: '诗篇四十六的秘密'
 excerpt: '令人敬畏的事物不会有丝毫保留。令人敬畏的事物丰盛而慷慨。宝藏就守候在那里。'
 coverImage: '/assets/blog/psalm-46/cover.jpg'
 date: '2019-06-20'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
-ogImage:
-  url: '/assets/blog/psalm-46/cover.jpg'
 ---
 
 <iframe width="740" height="416" src="https://www.youtube.com/embed/u0OY1RDe8Yg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

@@ -3,11 +3,6 @@ title: 'How Closures Work'
 excerpt: 'Closures are not easy to grasp, but it ain’t impossible. We, as learners, have to understand that, 99% of the time, a concept is always built upon others. We have to figure out how all those dots are connected. Who’s first, who’s next. It’s usually a good approach to trace what you don’t understand in reverse. Start with the definition, break it, and repeat it on every small part. And here, we are gonna do this on closures.'
 coverImage: '/assets/blog/dynamic-routing/cover.jpg'
 date: '2020-06-19'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
-ogImage:
-  url: '/assets/blog/closure/cover.jpg'
 ---
 
 _EDIT: This post is written years ago when I was just starting my functional programming and JavaScript learning. So there are probably quite a number of mistakes and it's recommended not to fully believe what I said in this one. I'll rewrite this post, just to correct myself, someday._

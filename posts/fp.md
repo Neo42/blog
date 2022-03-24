@@ -3,11 +3,6 @@ title: 'FP in Plain English: How Composition & Currying Work'
 excerpt: "Functional programming is a cool programming style with a lot of neat benefits, but it's also poorly explained and rarely understood. It's mainly because of the lack of intuition in math language. People can't understand you if you sound alien. In this series of posts, I'm going to shortly explain to you some FP concepts in plain and simple, day-to-day English. Hope you find this helpful."
 coverImage: '/assets/blog/fp/cover.jpg'
 date: '2021-04-09'
-author:
-  name: Hao Jiang
-  picture: '/assets/blog/authors/hao.png'
-ogImage:
-  url: '/assets/blog/fp/cover.jpg'
 ---
 
 Functional programming is a cool programming style with a lot of neat benefits, but it's also poorly explained and rarely understood. It's mainly because of the lack of intuition in math language. People can't understand you if you sound alien. In this series of posts, I'm going to shortly explain to you some FP concepts in plain and simple, day-to-day English. Hope you find this helpful.
