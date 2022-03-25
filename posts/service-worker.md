@@ -1,5 +1,5 @@
 ---
-title: 'Service Worker Explained'
+title: 'Web Worker & Service Worker Explained'
 excerpt: 'Websites are by default fragile and brittle, as they are always failing because of slow connections, server downtime and simply going offline. However, service workers might be a good way to help the web have an intuitive and empathetic experience for the user.'
 date: '2022-03-23'
 ---
