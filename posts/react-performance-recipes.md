@@ -14,6 +14,7 @@ date: '2022-01-05'
 ```js
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
+
 React.useEffect(() => {
   updateLocalStorage()
 }, []) // what goes in that dependency list?
@@ -30,6 +31,7 @@ When you're using a callback function within `useEffect`, it's hard to predict h
 ```js focus=5
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
+
 React.useEffect(() => {
   updateLocalStorage()
 }, [updateLocalStorage]) // <-- function as a dependency
@@ -47,6 +49,7 @@ One way we can solve this is to include the entire callback function into the de
 // recreated in every render
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
+
 React.useEffect(() => {
   updateLocalStorage()
 }, [updateLocalStorage]) // changes in every render
@@ -64,6 +67,7 @@ But doing this also introduces another problem -- because the callback function 
 // how to optimize this with useCallback?
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
+
 React.useEffect(() => {
   updateLocalStorage()
 }, [updateLocalStorage])
@@ -86,6 +90,7 @@ const updateLocalStorage = React.useCallback(
     ),
   [count] // <-- yup! That's a dependency list!
 )
+
 React.useEffect(() => {
   updateLocalStorage()
 }, [updateLocalStorage])
