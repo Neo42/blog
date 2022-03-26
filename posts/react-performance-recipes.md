@@ -57,7 +57,7 @@ React.useEffect(() => {
 
 </StepHead>
 
-But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be re-initialized from scratch every time the component gets rendered, and since functions are compared through references, even if the code of a function isn't modified between renders, every time it gets re-initialized, it will be [different](focus://1:3,6) from "itself" in the last render of the component, which will trigger a infinite re-rendering loop that you definitely wouldn't like. And that difference is what some people call "referential inequality", which will also happen when you're working with objects and arrays, because these three types are structural types that are compared through references.
+But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be re-initialized from scratch every time the component gets rendered, and since functions are compared through references, even if the code of a function isn't modified between renders, every time it gets re-initialized, it will be different from it "previous" self in the last render of the component, which will trigger a infinite re-rendering loop that you definitely wouldn't like. And that difference is what some people call "referential inequality", which will also happen when you're working with objects and arrays, because these three types are structural types that are compared through references.
 
 <CodeSlot style={{zoom: 0.8}}/>
 
