@@ -28,7 +28,7 @@ When you're using a callback function within `useEffect`, it's hard to predict h
 
 <StepHead>
 
-```js focus=5
+```js
 const updateLocalStorage = () =>
   window.localStorage.setItem('count', count)
 
@@ -57,7 +57,7 @@ React.useEffect(() => {
 
 </StepHead>
 
-But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be recreated (or "re-initialized") from scratch every time the component gets rendered, and since the function type is compared through references, every re-initialized callback function is [different](focus://1:3,6). So `useEffect` fires in every render due to the value referential inequality of the callback function in the deps list.
+But doing this also introduces another problem -- because the callback function is defined in the component's function body, it will be re-initialized from scratch every time the component gets rendered, and since functions are compared through references, even if the code of a function isn't modified between renders, every time it gets re-initialized, it will be [different](focus://1:3,6) from "itself" in the last render of the component, which will trigger a infinite re-rendering loop that you definitely wouldn't like. And that difference is what some people call "referential inequality", which will also happen when you're working with objects and arrays, because these three types are structural types that are compared through references.
 
 <CodeSlot style={{zoom: 0.8}}/>
 
@@ -194,7 +194,7 @@ With [`useMemo`](focus://2:4), here is the optimized version of `MyComponent`. A
 
 ## So when should I `useMemo` and `useCallback`?
 
-Use `useCallback` when you want to avoid unnecessary re-renders caused by **referential inequality**, for example:
+Use `useCallback` when you want to avoid unnecessary re-renders caused by **referential inequality** of structural data types, for example:
 
 <HikeWithNoPreview>
 
