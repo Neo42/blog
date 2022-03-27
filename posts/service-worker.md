@@ -43,13 +43,9 @@ To initialize a service worker:
 async function initServiceWorker() {
   // URL rewrite might be needed for sw scoping
   // register method is async
-  swRegistration =
-    await navigator.serviceWorker.register(
-      '/sw.js',
-      {
-        updateViaCache: 'none',
-      }
-    )
+  swRegistration = await navigator.serviceWorker.register('/sw.js', {
+    updateViaCache: 'none',
+  })
 
   // default sw lifecycle: installed => waiting (optional) => active
   // only one sw can be active at the time
@@ -63,8 +59,7 @@ async function initServiceWorker() {
   navigator.serviceWorker.addEventListener(
     'controllerchange',
     function onControllerChange() {
-      serviceWorker =
-        navigator.serviceWorker.controller
+      serviceWorker = navigator.serviceWorker.controller
     }
   )
 }
@@ -83,15 +78,11 @@ self.addEventListener('activate', onActivate)
 main().catch(console.error)
 
 async function main() {
-  console.log(
-    `Service Worker (${version}) is starting...`
-  )
+  console.log(`Service Worker (${version}) is starting...`)
 }
 
 async function onInstall() {
-  console.log(
-    `Service Worker (${version}) installed.`
-  )
+  console.log(`Service Worker (${version}) installed.`)
   // skip the waiting phase
   self.skipWaiting()
 }
@@ -104,28 +95,18 @@ async function onActivate(event) {
 async function handleActivation() {
   // to fire the `controllerchange` event
   await clients.claim()
-  console.log(
-    `Service Worker (${version}) activated.`
-  )
+  console.log(`Service Worker (${version}) activated.`)
 }
 ```
 
 And you can send messages to your service worker as it's basically a web worker. You can send the message to the message channel port it's listening on, or let the service worker controlling the current page send the message. Here is an example of sending messages from the page to the service workers based on the the page status changes.
 
 ```js
-var isOnline =
-  'onLine' in navigator
-    ? navigator.onLine
-    : true
-var isLoggedIn = /isLoggedIn=1/.test(
-  document.cookie.toString() || ''
-)
+var isOnline = 'onLine' in navigator ? navigator.onLine : true
+var isLoggedIn = /isLoggedIn=1/.test(document.cookie.toString() || '')
 
 function sendStatusUpdate(target) {
-  sendSWMessage(
-    {statusUpdate: {isOnline, isLoggedIn}},
-    target
-  )
+  sendSWMessage({statusUpdate: {isOnline, isLoggedIn}}, target)
 }
 
 function onSWMessage(event) {
@@ -136,9 +117,7 @@ function onSWMessage(event) {
       `Received status update request from service worker, responding...`
     )
     // send to the message channel port that the service worker is listening on
-    sendStatusUpdate(
-      event.ports && event.ports[0]
-    )
+    sendStatusUpdate(event.ports && event.ports[0])
   }
 }
 
@@ -148,31 +127,23 @@ function sendSWMessage(message, target) {
   } else if (serviceWorker) {
     serviceWorker.postMessage(message)
   } else {
-    navigator.serviceWorker.controller.postMessage(
-      message
-    )
+    navigator.serviceWorker.controller.postMessage(message)
   }
 }
 
 function ready() {
   // ...
-  window.addEventListener(
-    'online',
-    function online() {
-      offlineIcon.classList.add('hidden')
-      isOnline = true
-      sendStatusUpdate()
-    }
-  )
+  window.addEventListener('online', function online() {
+    offlineIcon.classList.add('hidden')
+    isOnline = true
+    sendStatusUpdate()
+  })
 
-  window.addEventListener(
-    'offline',
-    function offline() {
-      offlineIcon.classList.remove('hidden')
-      isOnline = false
-      sendStatusUpdate()
-    }
-  )
+  window.addEventListener('offline', function offline() {
+    offlineIcon.classList.remove('hidden')
+    isOnline = false
+    sendStatusUpdate()
+  })
 
   async function initServiceWorker() {
     // ...
@@ -185,8 +156,7 @@ function ready() {
     navigator.serviceWorker.addEventListener(
       'controllerchange',
       function onControllerChange() {
-        serviceWorker =
-          navigator.serviceWorker.controller
+        serviceWorker = navigator.serviceWorker.controller
         sendStatusUpdate(serviceWorker)
       }
     )
@@ -215,22 +185,17 @@ async function sendMessage(message) {
     includeUncontrolled: true,
   })
   return Promise.all(
-    allClients.map(function clientMessage(
-      client
-    ) {
+    allClients.map(function clientMessage(client) {
       var channel = new MessageChannel()
       channel.port1.onmessage = onMessage
-      return client.postMessage(message, [
-        channel.port2,
-      ])
+      return client.postMessage(message, [channel.port2])
     })
   )
 }
 
 function onMessage({data}) {
   if (data.statusUpdate) {
-    ;({isOnline, isLoggedIn} =
-      data.statusUpdate)
+    ;({isOnline, isLoggedIn} = data.statusUpdate)
     console.log(
       `Service Worker (${version}) status update... isOnline:${isOnline}, isLoggedIn:${isLoggedIn}`
     )
@@ -326,9 +291,7 @@ async function handleActivation() {
   })
   // fire `controllerchange` event
   await clients.claim()
-  console.log(
-    `Service Worker (${version}) activated.`
-  )
+  console.log(`Service Worker (${version}) activated.`)
 }
 ```
 
@@ -344,26 +307,18 @@ async function handleActivation() {
 
 async function clearCaches() {
   var cacheNames = await caches.keys()
-  var oldCacheNames = cacheNames.filter(
-    function matchOldCache(cacheName) {
-      if (/^ramblings-\d+$/.test(cacheName)) {
-        let [, cacheVersion] =
-          cacheName.match(/^ramblings-(\d+)$/)
-        cacheVersion =
-          cacheVersion !== null
-            ? Number(cacheVersion)
-            : cacheVersion
-        return (
-          cacheVersion > 0 &&
-          cacheVersion !== version
-        )
-      }
+  var oldCacheNames = cacheNames.filter(function matchOldCache(
+    cacheName
+  ) {
+    if (/^ramblings-\d+$/.test(cacheName)) {
+      let [, cacheVersion] = cacheName.match(/^ramblings-(\d+)$/)
+      cacheVersion =
+        cacheVersion !== null ? Number(cacheVersion) : cacheVersion
+      return cacheVersion > 0 && cacheVersion !== version
     }
-  )
+  })
   return Promise.all(
-    oldCacheNames.map(function deleteCache(
-      cacheName
-    ) {
+    oldCacheNames.map(function deleteCache(cacheName) {
       return caches.delete(cacheName)
     })
   )
@@ -398,15 +353,9 @@ async function router(request) {
         cache: 'no-store',
       }
 
-      res = await fetch(
-        request.url,
-        fetchOptions
-      )
+      res = await fetch(request.url, fetchOptions)
       if (res && res.ok) {
-        await cache.put(
-          requestUrl,
-          res.clone()
-        )
+        await cache.put(requestUrl, res.clone())
         return res
       }
     } catch (error) {}

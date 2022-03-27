@@ -72,8 +72,7 @@ Here is an extremely simple functor, which has a `.map` method that can be used 
 // Composition Law
 const f = (x) => x + 1
 const g = (x) => x * 2
-number.map(f).map(g).value ===
-  number.map((x) => g(f(x))).value // true
+number.map(f).map(g).value === number.map((x) => g(f(x))).value // true
 // Identity Law
 number.map((x) => x).value === number // true
 ```
@@ -86,9 +85,7 @@ const nextCharForNumberString = (str) =>
     .map((str) => str.trim())
     .map((trimmed) => parseInt(trimmed))
     .map((number) => new Number(number + 1))
-    .map((nextNumber) =>
-      String.fromCharCode(nextNumber)
-    ).value
+    .map((nextNumber) => String.fromCharCode(nextNumber)).value
 
 const result = nextCharForNumberString(' 41 ')
 console.log(result) // '*'
@@ -124,9 +121,7 @@ const nextCharForNumberString = (str) =>
     .map((str) => str.trim())
     .map((trimmed) => parseInt(trimmed))
     .map((number) => new Number(number + 1))
-    .fold((nextNumber) =>
-      String.fromCharCode(nextNumber)
-    )
+    .fold((nextNumber) => String.fromCharCode(nextNumber))
 ```
 
 ### Other Sweet Benefits of Functors

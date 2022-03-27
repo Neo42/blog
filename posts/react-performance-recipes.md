@@ -83,11 +83,7 @@ React.useEffect(() => {
 
 ```js
 const updateLocalStorage = React.useCallback(
-  () =>
-    window.localStorage.setItem(
-      'count',
-      count
-    ),
+  () => window.localStorage.setItem('count', count),
   [count] // <-- yup! That's a dependency list!
 )
 
@@ -109,10 +105,7 @@ And now every time the component gets re-rendered, the `updateLocalStorage` call
 const callback = () => {}
 
 // vs its memoized version
-const memoizedCallback = React.useCallback(
-  callback,
-  [someValue]
-)
+const memoizedCallback = React.useCallback(callback, [someValue])
 ```
 
 </StepHead>
@@ -176,10 +169,7 @@ function MyComponent({x, y}) {
 
 ```js
 function MyComponent({x, y}) {
-  const result = React.useMemo(
-    () => expensiveCalculation(x, y),
-    [x, y]
-  )
+  const result = React.useMemo(() => expensiveCalculation(x, y), [x, y])
   return <div>The result is {result}.</div>
 }
 ```
@@ -219,10 +209,7 @@ function Foo({bar, baz}) {
 
 function Blub() {
   const bar = React.useCallback(() => {}, [])
-  const baz = React.useMemo(
-    () => [1, 2, 3],
-    []
-  )
+  const baz = React.useMemo(() => [1, 2, 3], [])
   return <Foo bar={bar} baz={baz} />
 }
 ```
@@ -236,26 +223,18 @@ When using [values](focus://18:21) as [dependencies](focus://2,5,10,13) in `useE
 <StepHead>
 
 ```js
-const CountButton = React.memo(
-  function CountButton({onClick, count}) {
-    return (
-      <button onClick={onClick}>
-        {count}
-      </button>
-    )
-  }
-)
+const CountButton = React.memo(function CountButton({onClick, count}) {
+  return <button onClick={onClick}>{count}</button>
+})
 
 function DualCounter() {
-  const [count1, setCount1] =
-    React.useState(0)
+  const [count1, setCount1] = React.useState(0)
   const increment1 = React.useCallback(
     () => setCount1((c) => c + 1),
     []
   )
 
-  const [count2, setCount2] =
-    React.useState(0)
+  const [count2, setCount2] = React.useState(0)
   const increment2 = React.useCallback(
     () => setCount2((c) => c + 1),
     []
@@ -263,14 +242,8 @@ function DualCounter() {
 
   return (
     <>
-      <CountButton
-        count={count1}
-        onClick={increment1}
-      />
-      <CountButton
-        count={count2}
-        onClick={increment2}
-      />
+      <CountButton count={count1} onClick={increment1} />
+      <CountButton count={count2} onClick={increment2} />
     </>
   )
 }
@@ -285,13 +258,9 @@ When using [`React.memo`](focus://1,9) to avoid unnecessary child re-renders whe
 <StepHead>
 
 ```js
-function RenderPrimes({
-  iterations,
-  multiplier,
-}) {
+function RenderPrimes({iterations, multiplier}) {
   const primes = React.useMemo(
-    () =>
-      calculatePrimes(iterations, multiplier),
+    () => calculatePrimes(iterations, multiplier),
     [iterations, multiplier]
   )
   return <div>Primes! {primes}</div>
@@ -325,9 +294,7 @@ Now the first three can't and also shouldn't be avoided because those are basica
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 
 function NameInput({name, onNameChange}) {
@@ -336,9 +303,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -354,16 +319,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -383,9 +342,7 @@ Here is an example:
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 
 function NameInput({name, onNameChange}) {
@@ -394,9 +351,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -412,16 +367,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -439,9 +388,7 @@ When you click the [`CountButton`](focus://31:34), it changes the [state](focus:
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 
 function NameInput({name, onNameChange}) {
@@ -450,9 +397,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -468,16 +413,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -495,9 +434,7 @@ So how do we solve this problem?
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 
 function NameInput({name, onNameChange}) {
@@ -506,9 +443,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -524,16 +459,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -555,9 +484,7 @@ function Example() {
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 
 function NameInput({name, onNameChange}) {
@@ -566,9 +493,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -585,16 +510,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -616,9 +535,7 @@ By doing this we let React know that it doesn't need a re-render until at least 
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 CountButton = React.memo(CountButton)
 
@@ -628,9 +545,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -647,16 +562,10 @@ function Example() {
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -678,9 +587,7 @@ You might want to ask what if we do this to the `CountButton`. Here is the answe
 
 ```js
 function CountButton({count, onClick}) {
-  return (
-    <button onClick={onClick}>{count}</button>
-  )
+  return <button onClick={onClick}>{count}</button>
 }
 CountButton = React.memo(CountButton)
 
@@ -690,9 +597,7 @@ function NameInput({name, onNameChange}) {
       Name:{' '}
       <input
         value={name}
-        onChange={(e) =>
-          onNameChange(e.target.value)
-        }
+        onChange={(e) => onNameChange(e.target.value)}
       />
     </label>
   )
@@ -702,24 +607,15 @@ NameInput = React.memo(NameInput)
 function Example() {
   const [name, setName] = React.useState('')
   const [count, setCount] = React.useState(0)
-  const increment = React.useCallback(
-    () => setCount((c) => c + 1),
-    []
-  )
+  const increment = React.useCallback(() => setCount((c) => c + 1), [])
 
   return (
     <div>
       <div>
-        <CountButton
-          count={count}
-          onClick={increment}
-        />
+        <CountButton count={count} onClick={increment} />
       </div>
       <div>
-        <NameInput
-          name={name}
-          onNameChange={setName}
-        />
+        <NameInput name={name} onNameChange={setName} />
       </div>
       {name ? (
         <div>{`${name}'s favorite number is ${count}`}</div>
@@ -778,22 +674,16 @@ function ListItem({
   highlightedIndex,
   ...props
 }) {
-  const isSelected =
-    selectedItem?.id === item.id
-  const isHighlighted =
-    highlightedIndex === index
+  const isSelected = selectedItem?.id === item.id
+  const isHighlighted = highlightedIndex === index
   return (
     <li
       {...getItemProps({
         index,
         item,
         style: {
-          fontWeight: isSelected
-            ? 'bold'
-            : 'normal',
-          backgroundColor: isHighlighted
-            ? 'lightgray'
-            : 'inherit',
+          fontWeight: isSelected ? 'bold' : 'normal',
+          backgroundColor: isHighlighted ? 'lightgray' : 'inherit',
         },
         ...props,
       })}
@@ -850,71 +740,44 @@ function ListItem({
   highlightedIndex,
   ...props
 }) {
-  const isSelected =
-    selectedItem?.id === item.id
-  const isHighlighted =
-    highlightedIndex === index
+  const isSelected = selectedItem?.id === item.id
+  const isHighlighted = highlightedIndex === index
   return (
     <li
       {...getItemProps({
         index,
         item,
         style: {
-          fontWeight: isSelected
-            ? 'bold'
-            : 'normal',
-          backgroundColor: isHighlighted
-            ? 'lightgray'
-            : 'inherit',
+          fontWeight: isSelected ? 'bold' : 'normal',
+          backgroundColor: isHighlighted ? 'lightgray' : 'inherit',
         },
         ...props,
       })}
     />
   )
 }
-ListItem = React.memo(
-  ListItem,
-  (prevProps, nextProps) => {
-    // true means do NOT rerender
-    // false means DO rerender
+ListItem = React.memo(ListItem, (prevProps, nextProps) => {
+  // true means do NOT rerender
+  // false means DO rerender
 
-    // these ones are easy if any of these changed, we should re-render
-    if (
-      prevProps.getItemProps !==
-      nextProps.getItemProps
-    )
-      return false
-    if (prevProps.item !== nextProps.item)
-      return false
-    if (prevProps.index !== nextProps.index)
-      return false
-    if (
-      prevProps.selectedItem !==
-      nextProps.selectedItem
-    )
-      return false
+  // these ones are easy if any of these changed, we should re-render
+  if (prevProps.getItemProps !== nextProps.getItemProps) return false
+  if (prevProps.item !== nextProps.item) return false
+  if (prevProps.index !== nextProps.index) return false
+  if (prevProps.selectedItem !== nextProps.selectedItem) return false
 
-    // this is trickier. We should only re-render if this list item:
-    // 1. was highlighted before and now it's not
-    // 2. was not highlighted before and now it is
-    if (
-      prevProps.highlightedIndex !==
-      nextProps.highlightedIndex
-    ) {
-      const wasPrevHighlighted =
-        prevProps.highlightedIndex ===
-        prevProps.index
-      const isNowHighlighted =
-        nextProps.highlightedIndex ===
-        nextProps.index
-      return (
-        wasPrevHighlighted ===
-        isNowHighlighted
-      )
-    }
-    return true
+  // this is trickier. We should only re-render if this list item:
+  // 1. was highlighted before and now it's not
+  // 2. was not highlighted before and now it is
+  if (prevProps.highlightedIndex !== nextProps.highlightedIndex) {
+    const wasPrevHighlighted =
+      prevProps.highlightedIndex === prevProps.index
+    const isNowHighlighted =
+      nextProps.highlightedIndex === nextProps.index
+    return wasPrevHighlighted === isNowHighlighted
   }
-)
+  return true
+})
 ```
 
 </StepHead>
@@ -942,12 +805,8 @@ function Menu({
           item={item}
           index={index}
           // we move the calculation details here
-          isSelected={
-            selectedItem?.id === item.id
-          }
-          isHighlighted={
-            highlightedIndex === index
-          }
+          isSelected={selectedItem?.id === item.id}
+          isHighlighted={highlightedIndex === index}
         >
           {item.name}
         </ListItem>
@@ -972,12 +831,8 @@ function ListItem({
         index,
         item,
         style: {
-          backgroundColor: isHighlighted
-            ? 'lightgray'
-            : 'inherit',
-          fontWeight: isSelected
-            ? 'bold'
-            : 'normal',
+          backgroundColor: isHighlighted ? 'lightgray' : 'inherit',
+          fontWeight: isSelected ? 'bold' : 'normal',
         },
         ...props,
       })}
@@ -1044,10 +899,7 @@ function MyListOfData({items}) {
   const rowVirtualizer = useVirtual({
     size: items.length,
     parentRef: listRef,
-    estimateSize: React.useCallback(
-      () => 20,
-      []
-    ),
+    estimateSize: React.useCallback(() => 20, []),
     overscan: 10,
   })
 
@@ -1064,26 +916,24 @@ function MyListOfData({items}) {
           height: rowVirtualizer.totalSize,
         }}
       />
-      {rowVirtualizer.virtualItems.map(
-        ({index, size, start}) => {
-          const item = items[index]
-          return (
-            <li
-              key={item.id}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: size,
-                transform: `translateY(${start}px)`,
-              }}
-            >
-              {item.name}
-            </li>
-          )
-        }
-      )}
+      {rowVirtualizer.virtualItems.map(({index, size, start}) => {
+        const item = items[index]
+        return (
+          <li
+            key={item.id}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: size,
+              transform: `translateY(${start}px)`,
+            }}
+          >
+            {item.name}
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -1134,10 +984,7 @@ Here is a basic example:
 ```js
 return (
   <App>
-    <Profiler
-      id="Navigation"
-      onRender={onRenderCallback}
-    >
+    <Profiler id="Navigation" onRender={onRenderCallback}>
       <Navigation {...props} />
     </Profiler>
   </App>
@@ -1166,10 +1013,7 @@ function onRenderCallback(
 // ...
 return (
   <App>
-    <Profiler
-      id="Navigation"
-      onRender={onRenderCallback}
-    >
+    <Profiler id="Navigation" onRender={onRenderCallback}>
       <Navigation {...props} />
     </Profiler>
   </App>

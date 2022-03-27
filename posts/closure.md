@@ -27,7 +27,9 @@ As I said before, when you run a piece of code like `var bar = 'foo';`, it is di
 
 ### First Phase: Compilation
 
-    var bar;
+```js
+var bar
+```
 
 This phase is, as the name suggests, carried out by the compiler. The compiler will go ahead and search in the current scope if there is a declaration with the name **`bar`**. (Look, I know you still don’t understand how scoping works in JavaScript but we will get to that part later in this article. For now, just bear with me for a second.) If it finds such a declaration, the compiler will directly ignore all declarations after the first one; if it is not found, then implement this declaration and create a new variable.
 
@@ -39,7 +41,7 @@ bar = 'foo'
 
 Time to execute the code. The interpreter (the program that executes the code) will do it. It will first look for the variable `bar` in the current scope. If it finds it, it will assign it the string ‘foo’. If it cannot find it, it will look for it in the parent scope, which is the scope surrounding the current scope.
 
-## How Does JS Scoping Work?
+## How Does JS Scoping Work
 
 ### Lexical Scoping VS Dynamic Scoping
 
@@ -289,36 +291,20 @@ So what is currying then? Just so you are not upset by the computer science jarg
 
 ```js
 // Generic version:
-const getFullLocation_ = (
-  country,
-  province,
-  city,
-  district
-) =>
+const getFullLocation_ = (country, province, city, district) =>
   `${district}, ${city}, ${province}, ${country}`
 
-console.log(
-  getFullLocation_(
-    `China`,
-    `Beijing`,
-    `Beijing`,
-    `Haidian`
-  )
-)
+console.log(getFullLocation_(`China`, `Beijing`, `Beijing`, `Haidian`))
 // Haidian, Beijing, Beijing, China
 
 // Curried version:
 const getFullLocation =
-  (country) =>
-  (province) =>
-  (city) =>
-  (district) =>
+  (country) => (province) => (city) => (district) =>
     `${district}, ${city}, ${province}, ${country}`
 
 let China = getFullLocation('China') // individual record for China
 let BeijingProv = China('Beijing') // for Beijing Province
-let Haidian =
-  BeijingProv('Beijing')('Haidian') // Haidian
+let Haidian = BeijingProv('Beijing')('Haidian') // Haidian
 ```
 
 But why bother? As you can see, if you use a generic function, you won’t get anything other than the final one-step result. And that can be frustrating in real-world applications. Because, especially in enterprise-scale applications, you’ll want to reuse what you have created as much as possible. That’s what they call “DRY” - “Don’t repeat yourself”. That’s the point of currying. It makes your functions more reusable and more customizable so that they can better compose together.
@@ -329,17 +315,12 @@ Like curried functions, partial function applications work similarly. The only d
 function getLocation(country) {
   return function (province, city) {
     return function (district) {
-      return (
-        country + province + city + district
-      )
+      return country + province + city + district
     }
   }
 }
 
-let Beijing = getLocation('China')(
-  'Beijing',
-  'Beijing'
-) // Beijing
+let Beijing = getLocation('China')('Beijing', 'Beijing') // Beijing
 let Haidian = Beijing('Haidian') // Haidian
 ```
 

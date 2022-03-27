@@ -76,8 +76,7 @@ This means that, in the operation, you can split an argument, take its bits and 
 
 ```js
 // distributive
-add(multiply(x, y), multiply(x, z)) ===
-  multiply(x, add(y, z))
+add(multiply(x, y), multiply(x, z)) === multiply(x, add(y, z))
 ```
 
 After understanding these concepts, you can move on to actually write some code with some FP techniques, one of which is good old currying. It might sound weird at the first glance. But it's actually surprisingly easy to grasp. Just read on and make sure to try out the code example for yourself.
@@ -142,15 +141,11 @@ There are many existing solutions for doing functional programming in JavaScript
 ```js
 import {curry} from 'ramda'
 
-const replace = curry(
-  (regex, replacement, str) =>
-    str.replace(regex, replacement)
+const replace = curry((regex, replacement, str) =>
+  str.replace(regex, replacement)
 )
 
-const replaceVowels = replace(
-  /[AEIOU]/gi,
-  '!'
-)
+const replaceVowels = replace(/[AEIOU]/gi, '!')
 const result = replaceVowels('I have a pen.')
 console.log(result) // '! h!v! ! p!n.'
 ```
@@ -215,21 +210,11 @@ const toUpper = (str) => str.toUpperCase()
 const exclaim = (str) => `${str}!`
 const first = (str) => str.charAt(0)
 
-const shout = compose(
-  exclaim,
-  compose(toUpper, first)
-)
+const shout = compose(exclaim, compose(toUpper, first))
 // is the same as
-const shout_ = compose(
-  compose(exclaim, toUpper),
-  first
-)
+const shout_ = compose(compose(exclaim, toUpper), first)
 // also the same as
-const shout__ = compose(
-  exclaim,
-  toUpper,
-  first
-)
+const shout__ = compose(exclaim, toUpper, first)
 
 console.log(shout('tears')) // 'T!'
 console.log(shout_('tears')) // 'T!'
