@@ -6,10 +6,10 @@ export default function CustomLink(props) {
   const classes = 'text-blue-700'
   if (isInternalLink) {
     return (
-      <Link href={href}>
-        <a {...props} className={classes} />
-      </Link>
-    )
+      (<Link href={href} {...props} className={classes}>
+
+      </Link>)
+    );
   }
   return (
     <a
