@@ -10,7 +10,7 @@ export default function Intro() {
           href="https://github.com/Neo42"
           className="underline transition-colors duration-200 hover:text-success"
         >
-          Hao Jiang
+          Johnny Jiang
         </a>
       </h4>
     </section>
